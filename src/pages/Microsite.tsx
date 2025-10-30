@@ -9,6 +9,7 @@ import { getServiceBranding } from "@/lib/serviceLogos";
 import { getServiceBrandingByType, getServiceTitle, getServiceIcon } from "@/lib/serviceBranding";
 import { gccShippingServices } from "@/lib/gccShippingServices";
 import SEOHead from "@/components/SEOHead";
+import ServiceSeal from "@/components/ServiceSeal";
 import {
   MapPin,
   Users,
@@ -122,39 +123,66 @@ const Microsite = () => {
       <div className="min-h-screen py-12 bg-gradient-to-b from-background to-secondary/20" dir="rtl">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            {/* Header Badge */}
-            <div className="text-center mb-8 animate-fade-in">
-              <Badge className="text-lg px-6 py-3 text-white border-0" style={{ background: serviceBranding.gradient }}>
-                <Shield className="w-5 h-5 ml-2" />
-                <span>موثّق ومحمي {serviceBranding.seal}</span>
+            {/* Header Badges */}
+            <div className="text-center mb-8 animate-fade-in space-y-3">
+              <ServiceSeal serviceType={serviceType} verified={true} />
+              <Badge className="text-base px-5 py-2 text-white border-0 shadow-lg" 
+                     style={{ background: serviceBranding.gradient }}>
+                <Shield className="w-4 h-4 ml-2" />
+                <span>دفع آمن ومحمي 🔒</span>
               </Badge>
             </div>
             
             {/* Main Card */}
             <Card className="overflow-hidden shadow-2xl animate-fade-in">
-              {/* Header with Service Colors */}
+              {/* Header with Service Colors - Enhanced */}
               <div
-                className="h-40 relative overflow-hidden"
+                className="h-48 relative overflow-hidden"
                 style={{ background: serviceBranding.gradient }}
               >
-                <div className="absolute inset-0 bg-black/20" />
-                <div className="absolute inset-0 opacity-10" 
+                {/* Animated background pattern */}
+                <div className="absolute inset-0 bg-black/10" />
+                <div className="absolute inset-0 opacity-20 animate-pulse" 
                      style={{ 
-                       backgroundImage: 'radial-gradient(circle, white 1px, transparent 1px)', 
-                       backgroundSize: '20px 20px' 
+                       backgroundImage: 'radial-gradient(circle, white 2px, transparent 2px)', 
+                       backgroundSize: '30px 30px' 
                      }} 
                 />
-                <div className="absolute bottom-6 right-6 text-white">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="text-5xl">{serviceIconEmoji}</span>
+                
+                {/* Service icon background */}
+                <div className="absolute -right-10 -top-10 opacity-10">
+                  <span className="text-[200px]">{serviceIconEmoji}</span>
+                </div>
+                
+                {/* Content */}
+                <div className="absolute bottom-6 right-6 text-white z-10">
+                  <div className="flex items-center gap-4 mb-2">
+                    <div className="bg-white/20 backdrop-blur-sm p-3 rounded-xl">
+                      <span className="text-4xl">{serviceIconEmoji}</span>
+                    </div>
                     <div>
-                      <p className="text-sm opacity-90">{serviceTitle.ar}</p>
-                      <h1 className="text-3xl font-bold">{serviceName}</h1>
+                      <p className="text-sm opacity-90 font-medium">{serviceTitle.ar}</p>
+                      <h1 className="text-3xl font-bold drop-shadow-lg">{serviceName}</h1>
                     </div>
                   </div>
                 </div>
-                <div className="absolute top-6 left-6 text-white">
-                  <p className="text-2xl font-bold opacity-90">{countryData.nameAr}</p>
+                
+                {/* Country badge */}
+                <div className="absolute top-6 left-6 text-white z-10">
+                  <div className="bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full">
+                    <p className="text-lg font-bold">{countryData.flag} {countryData.nameAr}</p>
+                  </div>
+                </div>
+                
+                {/* Verification badge */}
+                <div className="absolute top-6 right-6 z-10">
+                  <div className="bg-white/90 px-3 py-1 rounded-full flex items-center gap-1 shadow-lg">
+                    <svg width="16" height="16" viewBox="0 0 20 20" fill="none">
+                      <circle cx="10" cy="10" r="8" stroke={serviceBranding.primaryColor} strokeWidth="2" fill="none"/>
+                      <path d="M6 10l2 2 4-4" stroke={serviceBranding.primaryColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                    </svg>
+                    <span className="text-xs font-bold" style={{ color: serviceBranding.primaryColor }}>موثّق</span>
+                  </div>
                 </div>
               </div>
               
