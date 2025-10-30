@@ -12,7 +12,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
-import { useChalets, useCreateLink } from "@/hooks/useSupabase";
+import { useChalets, useCreateLink } from "@/hooks/useLocalStorage";
 import { ArrowRight, Home, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 

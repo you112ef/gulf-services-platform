@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { usePayment, useLink } from "@/hooks/useSupabase";
+import { usePayment, useLink } from "@/hooks/useLocalStorage";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
 import { CheckCircle2, Download, Home, Share2 } from "lucide-react";
 

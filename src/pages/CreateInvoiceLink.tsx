@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
-import { useCreateLink } from "@/hooks/useSupabase";
+import { useCreateLink } from "@/hooks/useLocalStorage";
 import { ArrowRight, FileText, Copy, Check, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
