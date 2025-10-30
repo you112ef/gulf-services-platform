@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData, useLinkNavigation } from "@/hooks/useUrlBasedData";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
 import { getServiceBranding } from "@/lib/serviceLogos";
 import { getServiceBrandingByType, getServiceTitle, getServiceIcon } from "@/lib/serviceBranding";
@@ -32,7 +32,8 @@ import {
 const Microsite = () => {
   const { country, type, id } = useParams();
   const navigate = useNavigate();
-  const { data: link, isLoading } = useLink(id);
+  const { linkData, isLoading, error } = useLinkData();
+  const { navigateToPayment } = useLinkNavigation();
   const countryData = getCountryByCode(country || "");
   
   if (isLoading) {
@@ -43,19 +44,19 @@ const Microsite = () => {
     );
   }
   
-  if (!link || !countryData) {
+  if (!linkData || error || !countryData) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold mb-2">الرابط غير موجود</h2>
-          <p className="text-muted-foreground">الرجاء التحقق من الرابط</p>
+          <h2 className="text-2xl font-bold mb-2">الرابط غير موجود أو غير صحيح</h2>
+          <p className="text-muted-foreground">{error || "الرجاء التحقق من الرابط"}</p>
         </div>
       </div>
     );
   }
   
-  const payload = link.payload;
-  const serviceType = link.type;
+  const payload = linkData.payload;
+  const serviceType = linkData.type;
   const serviceBranding = getServiceBrandingByType(serviceType);
   const serviceTitle = getServiceTitle(serviceType);
   const serviceIconEmoji = getServiceIcon(serviceType);
@@ -486,16 +487,16 @@ const Microsite = () => {
                   </ul>
                 </div>
                 
-                {/* Payment Button */}
-                <Button
-                  size="lg"
-                  className="w-full text-xl py-7 shadow-glow animate-pulse-glow border-0 text-white"
-                  style={{ background: serviceBranding.gradient }}
-                  onClick={() => navigate(`/pay/${link.id}/recipient`)}
-                >
-                  <CreditCard className="w-6 h-6 ml-3" />
-                  <span>ادفع الآن - {formatCurrency(totalAmount, payload.currency)}</span>
-                </Button>
+              {/* Payment Button */}
+              <Button
+                size="lg"
+                className="w-full text-xl py-7 shadow-glow animate-pulse-glow border-0 text-white"
+                style={{ background: serviceBranding.gradient }}
+                onClick={() => navigate(navigateToPayment(id!, linkData))}
+              >
+                <CreditCard className="w-6 h-6 ml-3" />
+                <span>ادفع الآن - {formatCurrency(totalAmount, payload.currency)}</span>
+              </Button>
                 
                 <div className="flex items-center justify-center gap-2 mt-4">
                   <Shield className="w-4 h-4 text-muted-foreground" />

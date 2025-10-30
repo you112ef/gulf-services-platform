@@ -12,7 +12,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
-import { useChalets, useCreateLink } from "@/hooks/useLocalStorage";
+import { useChalets } from "@/hooks/useLocalStorage";
+import { useCreateShareableLink } from "@/hooks/useUrlBasedData";
 import { ArrowRight, Home, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,7 +24,7 @@ const CreateChaletLink = () => {
   const countryData = getCountryByCode(country || "");
   
   const { data: chalets, isLoading } = useChalets(country);
-  const createLink = useCreateLink();
+  const { createLink, isCreating } = useCreateShareableLink();
   
   const [selectedChaletId, setSelectedChaletId] = useState<string>("");
   const [pricePerNight, setPricePerNight] = useState<number>(0);
@@ -55,14 +56,14 @@ const CreateChaletLink = () => {
     };
     
     try {
-      const link = await createLink.mutateAsync({
+      const shareableUrl = await createLink({
         type: "chalet",
         country_code: country!,
         provider_id: selectedChalet.provider_id || undefined,
         payload,
       });
       
-      setCreatedLink(link.microsite_url);
+      setCreatedLink(shareableUrl);
     } catch (error) {
       console.error("Error creating link:", error);
     }
@@ -254,10 +255,10 @@ const CreateChaletLink = () => {
                   {/* Create Button */}
                   <Button
                     onClick={handleCreate}
-                    disabled={createLink.isPending}
+                    disabled={isCreating}
                     className="w-full py-5"
                   >
-                    {createLink.isPending ? (
+                    {isCreating ? (
                       <span className="text-sm">جاري الإنشاء...</span>
                     ) : (
                       <>
