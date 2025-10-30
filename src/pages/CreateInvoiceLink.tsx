@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
-import { useCreateLink } from "@/hooks/useLocalStorage";
+import { useCreateShareableLink } from "@/hooks/useUrlBasedData";
 import { ArrowRight, FileText, Copy, Check, Plus, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -23,7 +23,7 @@ const CreateInvoiceLink = () => {
   const { toast } = useToast();
   const countryData = getCountryByCode(country || "");
   
-  const createLink = useCreateLink();
+  const { createLink, isCreating } = useCreateShareableLink();
   
   const [invoiceNumber, setInvoiceNumber] = useState<string>("");
   const [clientName, setClientName] = useState<string>("");
@@ -75,13 +75,13 @@ const CreateInvoiceLink = () => {
     };
     
     try {
-      const link = await createLink.mutateAsync({
+      const shareableUrl = await createLink({
         type: "invoice",
         country_code: country!,
         payload,
       });
       
-      setCreatedLink(link.microsite_url);
+      setCreatedLink(shareableUrl);
     } catch (error) {
       console.error("Error creating link:", error);
     }
@@ -323,10 +323,10 @@ const CreateInvoiceLink = () => {
               {/* Create Button */}
               <Button
                 onClick={handleCreate}
-                disabled={createLink.isPending || !invoiceNumber || !clientName || totalAmount <= 0}
+                disabled={isCreating || !invoiceNumber || !clientName || totalAmount <= 0}
                 className="w-full py-5"
               >
-                {createLink.isPending ? (
+                {isCreating ? (
                   <span className="text-sm">جاري الإنشاء...</span>
                 ) : (
                   <>

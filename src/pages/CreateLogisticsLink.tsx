@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCountryByCode, formatCurrency } from "@/lib/countries";
-import { useCreateLink } from "@/hooks/useLocalStorage";
+import { useCreateShareableLink } from "@/hooks/useUrlBasedData";
 import { ArrowRight, Truck, Copy, Check } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -34,7 +34,7 @@ const CreateLogisticsLink = () => {
   const { toast } = useToast();
   const countryData = getCountryByCode(country || "");
   
-  const createLink = useCreateLink();
+  const { createLink, isCreating } = useCreateShareableLink();
   
   const [serviceType, setServiceType] = useState<string>("");
   const [companyName, setCompanyName] = useState<string>("");
@@ -82,13 +82,13 @@ const CreateLogisticsLink = () => {
     };
     
     try {
-      const link = await createLink.mutateAsync({
+      const shareableUrl = await createLink({
         type: "logistics",
         country_code: country!,
         payload,
       });
       
-      setCreatedLink(link.microsite_url);
+      setCreatedLink(shareableUrl);
     } catch (error) {
       console.error("Error creating link:", error);
     }
@@ -369,10 +369,10 @@ const CreateLogisticsLink = () => {
                   {/* Create Button */}
                   <Button
                     onClick={handleCreate}
-                    disabled={createLink.isPending || !companyName || !contactPerson || !contactPhone || amount <= 0}
+                    disabled={isCreating || !companyName || !contactPerson || !contactPhone || amount <= 0}
                     className="w-full py-5"
                   >
-                    {createLink.isPending ? (
+                    {isCreating ? (
                       <span className="text-sm">جاري الإنشاء...</span>
                     ) : (
                       <>

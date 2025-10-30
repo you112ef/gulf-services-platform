@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { useCreateLink } from "@/hooks/useLocalStorage";
+import { useCreateShareableLink } from "@/hooks/useUrlBasedData";
 import { getCountryByCode } from "@/lib/countries";
 import { getServicesByCountry } from "@/lib/gccShippingServices";
 import { getServiceBranding } from "@/lib/serviceLogos";
@@ -18,7 +18,7 @@ const CreateShippingLink = () => {
   const { country } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const createLink = useCreateLink();
+  const { createLink, isCreating } = useCreateShareableLink();
   const countryData = getCountryByCode(country || "");
   const services = getServicesByCountry(country || "");
   
@@ -51,15 +51,17 @@ const CreateShippingLink = () => {
     }
     
     try {
-      const link = await createLink.mutateAsync({
+      const shareableUrl = await createLink({
         type: "shipping",
         country_code: country || "",
+        provider_id: selectedService,
         payload: {
           service_key: selectedService,
           service_name: selectedServiceData?.name || selectedService,
           tracking_number: trackingNumber,
           package_description: packageDescription,
           cod_amount: parseFloat(codAmount) || 0,
+          currency: countryData?.currency || "ر.س",
         },
       });
       
@@ -91,8 +93,7 @@ const CreateShippingLink = () => {
         });
       }
 
-      // Navigate to payment page with service parameter
-      navigate(`/pay/${link.id}/recipient?service=${selectedService}`);
+      setCreatedLink(shareableUrl);
     } catch (error) {
       console.error("Error creating link:", error);
     }
@@ -222,9 +223,9 @@ const CreateShippingLink = () => {
               <Button
                 type="submit"
                 className="w-full py-5"
-                disabled={createLink.isPending}
+                disabled={isCreating}
               >
-                {createLink.isPending ? (
+                {isCreating ? (
                   <span className="text-sm">جاري الإنشاء...</span>
                 ) : (
                   <>

